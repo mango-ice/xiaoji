@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+        <script type="text/javascript">
+            // var a= new Number;
+            for (var j = 0; j < 3; j = j + 0.1) {
+                for (var i = 0; i < 3; i = i + 0.1) {
+                    console.log(bright(3, 2, 0.2, 0, 1.8, 0, 1.8, i, j));
+                    // console.log(bright(3, 2, 1, 0, 2, 0, 2, i, j));
+                    // bright( 3, 3, 0.4, 0, 2, 0, 1.8, i, j); 
+                    // console.log("  ")
+                    // console.log(bright(3, 3, 0.4, 0, 2, 0, 2, j, i));
+                }
+                console.log(" ")
+            }
+            // console.log(bright(3, 3, 1, 0, 2, 0, 2, 1, 0.2));
+            // console.log(bright(3, 3, 1, 0, 2, 0, 2, 2, 0.2));
+            // indoorlight(1, 1, 10, 3, 2, 5) 
+/**
+ * @param {*房间深度} alength
+ * @param {*房间宽度} awidth
+ * @param {*窗户起点横向坐标} beginx
+ * @param {*窗户起点纵向坐标} beginy
+ * @param {*窗户终点横向坐标} endx
+ * @param {*窗户终点纵向坐标} endy
+ * @param {*窗户高度坐标} endz
+ * @param {*随机点深度坐标} Random_x
+ * @param {*随机点广度坐标} Random_y
+*/
+function bright(alength, awidth, beginx, beginy, endx, endy, endz, Random_x, Random_y) {
+    var length = endz;
+    var width = awidth;
+    var dwidth = 0,
+        lleft = 0
+    if (beginx == endx) {
+        var sp = Random_y
+        var depth = Random_x
+        dwidth = Math.abs(endy - beginy);
+        lleft = Math.abs(beginy)
+    } else {
+        var depth = Random_y
+        var sp = Random_x
+        dwidth = Math.abs(endx - beginx);
+        lleft = Math.abs(beginx)
+    } 
+    
+    var result = 
+    indoorlight(depth, sp, alength, length, width, dwidth, lleft)
+    +indoorLlight(depth, sp, alength,  width, length, dwidth, lleft) 
+    + indoorRlight(depth, sp, alength, length, width, dwidth, lleft) 
+    +indoorinlight(depth, sp, alength, length, width, dwidth, lleft);
+    return result
+}
+/**
+ * @param {*点纵向深度} depth
+ * @param {*点横深度} sp
+ * @param {*房间总长} alength
+ * @param {*窗户高度} length
+ * @param {*房间宽度} width
+ * @param {*窗户宽度} dwidth
+ * @param {*窗户距离边缘距离} lleft  
+ * @param {*房间偏移角度} 
+ */
+// 直射光
+function indoorlight(depth, sp, alength,  width, length, dwidth, lleft) {
+
+    var c = 5, d = -2.5, e = 0.3;
+    var Z = 0,Az = 54*Math.PI/180,HL = 0,HR = 0,wl = 0,wr = 0;
+    var pi = Math.PI
+    lleft += dwidth/2
+
+    wl = Math.sqrt((sp - lleft) * (sp - lleft) + depth * depth)
+    wr = Math.abs((dwidth+lleft-sp)*(dwidth+lleft-sp) + depth*depth)
+
+    // 左侧边
+    HL = Math.sqrt(length * length + wl * wl)
+    // 右侧边
+    HR = Math.sqrt(length * length + wr * wr)
+    //上角w
+    var w = Math.abs(Math.acos((HL * HL + HR * HR - dwidth * dwidth) / 2 * HL * HR)/100) 
+
+    //侧边角Q
+
+    var Q = Math.abs(Math.atan(length / wl) / 100)
+
+    var Zs = 37 * pi / 180
+
+    var x = Math.abs(
+        Math.acos(Math.cos(Zs) * Math.sin(Z) - Math.sin(Zs) * Math.sin(Z) * Math.cos(Az))
+    )
+
+    //  散射指标
+    var fx = 1 + c * (Math.exp(d * x) - Math.exp(d * pi / 2)) + e * Math.cos(x) * Math.cos(x)
+
+    //  天顶值
+    var fZs = Math.abs(
+        1 + c * (Math.exp(d * Zs) - Math.exp(d * pi / 2)) + e * Math.cos(Zs) * Math.cos(Zs)
+    )
+
+    //  标准渐变
+    var io = Math.abs(
+        (1 - Math.exp((-0.55) / Math.sin(Z))) / (1 - Math.exp(-0.55))
+    )
+    // console.log(io)
+    //  天空亮度
+    var Lr = Math.abs(fx * io * 8.5192 / Math.abs(fZs))
+    // console.log(Lr)
+    // console.log(Az)
+    //求和
+    var sum = 0;
+    for (var i = 1; i < 100; i++) {
+        // console.log(Z);
+        for (var j = 1; j < 100; j++) {
+            // Z = i * (Q) - (i - 1) * Q;
+            Z = Q*i
+            // Az = j * (w) - (j - 1) * w
+            Az =Math.abs( Az + j * w )
+            var a = Math.sin(Q) *Lr
+            // console.log(a)
+            sum = sum + a;
+            // console.log(Lr);
+        }
+    }
+    // console.log(Az);
+    sum = sum * Math.sin(Q);
+    // console.log(w)
+    // sum = sum * Math.sin(w)
+
+    return sum
+}
+
+// 左侧反光
+function indoorLlight(depth, sp, alength,  width, length, dwidth, lleft) {
+    var f = 0.8;
+    sp = sp * (-1)
+    return (
+        indoorlight(depth, sp, alength,  width, length, dwidth, lleft) * f
+    )
+}
+
+// 右侧反光
+function indoorRlight(depth, sp, alength,  width, length, dwidth, lleft) {
+    var f = 0.8;
+    sp = 2 * width - sp;
+    return (
+        indoorlight(depth, sp, alength,  width, length, dwidth, lleft) * f
+    )
+}
+
+//直射反光
+function indoorinlight(depth, sp, alength,  width, length, dwidth, lleft) {
+    var f = 0.8;
+    h = 2 * alength - depth
+    return (
+        indoorlight(depth, sp, alength,  width, length, dwidth, lleft) * f
+    )
+}
+
+        </script>
+    </body>
+</html>

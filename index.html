@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script type="text/javascript">
+      // var a= new Number;
+      for(var j=0;j<10;j=j+0.5){
+        for(var i=0;i<10;i=i+0.5){
+          console.log(indoorlight(j,i,10,10,2));
+        }
+        console.log(" ")
+      }
+      // console.log(indoorlight(2,2,10,10,2,0));
+      // console.log(indoorlight(1,1,10,10,2));
+      // console.log(indoorlight(4,1,10,10,2));
+        
+      
+      //直射光
+    function indoorlight(depth,sp,length,width,dwidth){
+      /**
+       * 规定参数
+       * a,b,c,d,e为亮度参数
+       * Iz 天定亮度
+       * */
+      var c = 5,d=-2.5,e=0.3;
+      /**
+       * 数据推导参数
+       * Zs天顶值
+       * i,j  分别为纵向角和横向角的不定数值  
+       * Q，w为纵向角和横向角
+       */
+      var Z=0,Az=0,HL=0,HR=0,wl=0,wr=0;
+      var x=pi/180;
+      if(sp>=((dwidth+width)/2)){
+        //偏右侧
+        //wl 
+        wl=sp-(width-dwidth)/2
+        // console.log(wl);
+        //wr
+        wr=wl-dwidth
+        // console.log(wr);
+        // //左侧边
+        // HL=Math.sqrt(depth*depth+wl*wl+sp*sp)
+        // //右侧边
+        // HR=Math.sqrt(depth*depth+wr*wr)
+      }else if(sp<=((width-dwidth)/2)){
+        //偏左侧
+        //wl
+        wl=((width-dwidth)/2)-sp
+        // console.log(wl);
+        //wr
+        wr=wl+(width+dwidth)/2
+        // console.log(wr);
+        // //左侧边
+        // HL=Math.sqrt(depth*depth+wl*wl+sp*sp)
+        // //右侧边
+        // HR=Math.sqrt(depth*depth+wr*wr)
+      }else{
+        //wl
+        wl=sp-(width-dwidth)/2
+        // console.log(wl);
+        //wr
+        wr=dwidth-wl
+        // console.log(wr);
+        // //左侧边
+        // HL=Math.sqrt(depth*depth+wl*wl+sp*sp)
+        // //右侧边
+        // HR=Math.sqrt(depth^2+wr^2)
+      }
+      //左侧边
+      HL=Math.sqrt(depth*depth+wl*wl+sp*sp)
+      //右侧边
+      HR=Math.sqrt(depth*depth+wr*wr)
+      //上角w
+      var w=(Math.acos((HL*HL-HR*HR-dwidth*dwidth)/(2*HL*HR)))/10
+      //侧边角Q
+      var Q=(Math.atan(dwidth/Math.sqrt(dwidth/(HL*HL+(sp-(width-dwidth)/2)))))/10
+      // console.log(Q)
+      // var w=Math.asin((1.8*Math.sqrt(h^2+2.56))/((h^2)+3.37))
+      // var Q=Math.asin(2.56/(Math.sqrt(3.37+h^2)))
+      var pi=Math.PI
+      var Zs=37*pi/180
+      // console.log(Zs)
+      //  到太阳的角距离
+      var x=Math.acos(Math.cos(Zs)*Math.cos(Z)-Math.sin(Zs)*Math.sin(Z)*Math.cos(Az))
+      // console.log(x)
+      // 散射指标
+      var fx=1+c*( Math.exp(d*x) - Math.exp(d*pi/2))+e*Math.cos(x)*Math.cos(x)
+      // console.log(fx)
+      // 天顶值
+      var fZs=1+c*(Math.exp(d*Zs) - Math.exp(d*pi/2))+e*Math.cos(Zs)*Math.cos(Zs)    
+      // console.log(fZs)
+      //  标准渐变
+      var io=(1-Math.exp((-0.55)/Math.sin(Z)))
+      // console.log(io)
+      //  天空亮度
+      var Lr=(fx*io*8.5192)/(fZs)
+      // console.log(Lr)
+    
+      var sum=0;
+      for(var i=0;i<10;i++){
+        Z=i*(Q/10)*x;
+        // console.log(Z);
+        for(var j=0;j<10;j++){
+          Az=j*(w/10)*x;
+          // console.log(sum);
+          var a=Math.sin(Q*x)
+          sum=sum+Lr*a;
+        }
+      }
+      sum=sum*Math.sin(Q*x);
+      // sum=Math.round(sum*10/10);
+      return sum
+    }
+
+
+    // 左侧反光
+    function indoorLlight(depth,sp,length,width,dwidth,offAngle) {
+  var f=0.8;
+  sp=sp*(-1)
+  return (indoorlight(depth,sp,length,width,dwidth,offAngle)*f)
+}
+
+    // 右侧反光
+    function indoorRlight(depth,sp,length,width,dwidth,offAngle) {
+  var f=0.8;
+  sp=2*width-sp;
+  return (indoorlight(depth,sp,length,width,dwidth,offAngle)*f)
+}
+
+    //直射反光
+    function indoorinlight(depth,sp,length,width,dwidth,offAngle) {
+  var f=0.8;
+  h=2*length-depth
+  return (indoorlight(depth,sp,length,width,dwidth,offAngle)*f)
+}
+    function bright(depth,sp,length,width,dwidth,offAngle) {
+  var result=
+    indoorLlight(depth,sp,length,width,dwidth,offAngle)+
+    indoorRlight(depth,sp,length,width,dwidth,offAngle)+
+    indoorinlight(depth,sp,length,width,dwidth,offAngle)+
+    indoorlight(depth,sp,length,width,dwidth,offAngle);
+    return result
+}
+</script>
+</body>
+</html>
