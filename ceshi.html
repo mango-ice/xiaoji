@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		*{
+			margin: 0;
+			padding: 0;
+			list-style: none;
+			box-sizing: border-box;
+		}
+		.box{
+			width: 500px;
+			height: 500px;
+			margin: auto;
+			border: 1px solid #000;
+		}
+		.ul{
+			width: 100%;
+			height: auto;
+            /* background-color: ; */
+		}
+		.li{
+			width: 1px;
+			height: 1px;
+			float: left;
+			line-height: 1px;
+			/* text-align: center; */
+			/* border: 1px solid #eee; */
+		}
+	</style>
+</head>
+<script type="text/javascript">
+    // import { bright } from '../bright.js';
+        // var data =[]
+        var a = 0
+        var ul_box = document.querySelector(".ul");
+        for(var i=0;i<712-489;i=i+1){
+            for(var j=0;j<551-384;j=j+1){
+                a = Math.round( bright(712-489,551-384,9,0,157,0,1.6,j,i)*100)/100
+                // a = Math.round( bright(712-489,551-384,9,0,157,0,1.6,j,i)*100)/100
+                // // html+=`<li class="li" style="background: ">`
+                // if(a>=25){
+                //     html += `<li class="li" style="background-color:red"></li>`
+                // }else if(a>=22.5 && a<25){
+                //     html += `<li class="li" style="background-color:orange"></li>`
+                // }else if(a>=20.7 && a<22.5){
+                //     html += `<li class="li" style="background-color:yellow"></li>`
+                // }else if(a>=18.6 && a<20.7){
+                //     html += `<li class="li" style="background-color:green"></li>`
+                // }else if(a>=15.5 && a<18.6){
+                //     html += `<li class="li" style="background-color:greenyellow"></li>`
+                // }else if(a>=13.5 && a<15.5){
+                //     html += `<li class="li" style="background-color:skyblue"></li>`
+                // }else{
+                //     html += `<li class="li" style="background-color:blue"></li>`
+                // }
+                // ul_box.innerHTML = html
+                console.log(a)
+            
+            }
+            console.log("   ")
+        }
+        // a = Math.round( bright(712-489,551-384,393-384,0,541-384,0,1.6,157,68)*10)/10
+        // console.log(a)
+function bright(alength, awidth, beginx, beginy, endx, endy, endz, Random_x, Random_y) {
+var length = endz;
+var width = awidth;
+var dwidth = 0,
+    lleft = 0
+if (beginx == endx) {
+    var sp = Random_y
+    var depth = Random_x
+    dwidth = Math.abs(endy - beginy);
+    lleft = Math.abs(beginy)
+} else {
+    var depth = Random_y
+    var sp = Random_x
+    dwidth = Math.abs(endx - beginx);
+    lleft = Math.abs(beginx)
+} 
+
+var result = 
+indoorlight(depth, sp, alength, length, width, dwidth, lleft)
++indoorLlight(depth, sp, alength,  width, length, dwidth, lleft) 
++ indoorRlight(depth, sp, alength, length, width, dwidth, lleft) 
++indoorinlight(depth, sp, alength, length, width, dwidth, lleft);
+return result
+}
+
+// 直射光
+function indoorlight(depth, sp, alength,  width, length, dwidth, lleft) {
+
+var c = 5, d = -2.5, e = 0.3;
+var Z = 0,Az = 54*Math.PI/180,HL = 0,HR = 0,wl = 0,wr = 0;
+var pi = Math.PI
+lleft += dwidth/2
+
+wl = Math.sqrt((sp - lleft) * (sp - lleft) + depth * depth)
+wr = Math.abs((dwidth+lleft-sp)*(dwidth+lleft-sp) + depth*depth)
+
+// 左侧边
+HL = Math.sqrt(length * length + wl * wl)
+// 右侧边
+HR = Math.sqrt(length * length + wr * wr)
+//上角w
+var w = Math.abs(Math.acos((HL * HL + HR * HR - dwidth * dwidth) / 2 * HL * HR)/100) 
+
+//侧边角Q
+
+var Q = Math.abs(Math.atan(length / wl) / 100)
+
+var Zs = 37 * pi / 180
+
+var x = Math.abs(
+    Math.acos(Math.cos(Zs) * Math.sin(Z) - Math.sin(Zs) * Math.sin(Z) * Math.cos(Az))
+)
+
+//  散射指标
+var fx = 1 + c * (Math.exp(d * x) - Math.exp(d * pi / 2)) + e * Math.cos(x) * Math.cos(x)
+
+//  天顶值
+var fZs = Math.abs(
+    1 + c * (Math.exp(d * Zs) - Math.exp(d * pi / 2)) + e * Math.cos(Zs) * Math.cos(Zs)
+)
+
+//  标准渐变
+var io = Math.abs(
+    (1 - Math.exp((-0.55) / Math.sin(Z))) / (1 - Math.exp(-0.55))
+)
+// console.log(io)
+//  天空亮度
+var Lr = Math.abs(fx * io * 8.5192 / Math.abs(fZs))
+// console.log(Lr)
+// console.log(Az)
+//求和
+var sum = 0;
+for (var i = 1; i < 100; i++) {
+    // console.log(Z);
+    for (var j = 1; j < 100; j++) {
+        // Z = i * (Q) - (i - 1) * Q;
+        Z = Q*i
+        // Az = j * (w) - (j - 1) * w
+        Az =Math.abs( Az + j * w )
+        var a = Math.sin(Q) *Lr
+        // console.log(a)
+        sum = sum + a;
+        // console.log(Lr);
+    }
+}
+// console.log(Az);
+sum = sum * Math.sin(Q);
+// console.log(w)
+// sum = sum * Math.sin(w)
+
+return sum
+}
+
+// 左侧反光
+function indoorLlight(depth, sp, alength,  width, length, dwidth, lleft) {
+var f = 0.8;
+sp = sp * (-1)
+return (
+    indoorlight(depth, sp, alength,  width, length, dwidth, lleft) * f
+)
+}
+
+// 右侧反光
+function indoorRlight(depth, sp, alength,  width, length, dwidth, lleft) {
+var f = 0.8;
+sp = 2 * width - sp;
+return (
+    indoorlight(depth, sp, alength,  width, length, dwidth, lleft) * f
+)
+}
+
+//直射反光
+function indoorinlight(depth, sp, alength,  width, length, dwidth, lleft) {
+var f = 0.8;
+h = 2 * alength - depth
+return (
+    indoorlight(depth, sp, alength,  width, length, dwidth, lleft) * f
+)
+}
+
+</script>
+
+<body>
+    <div class="box">
+        <ul class="ul">
+            <!-- <li class="li" >21</li> -->
+		</ul>
+    </div>   
+</body>
+<!-- <script src="../bright.js"></script> -->
+</html>
