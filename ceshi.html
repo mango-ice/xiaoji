@@ -35,12 +35,10 @@
     // import { bright } from '../bright.js';
         // var data =[]
         var a = 0
-        var ul_box = document.querySelector(".ul");
-        for(var i=0;i<712-489;i=i+1){
-            for(var j=0;j<551-384;j=j+1){
-                a = Math.round( bright(712-489,551-384,9,0,157,0,1.6,j,i)*100)/100
-                // a = Math.round( bright(712-489,551-384,9,0,157,0,1.6,j,i)*100)/100
-                // // html+=`<li class="li" style="background: ">`
+        // var ul_box = document.querySelector(".ul");
+        for(var i=0;i<712-489;i++){
+            for(var j=0;j<551-384;j++){
+                a = Math.round( bright(712-489,551-384,9,0,157,0,1.6,i,j)*100)/100
                 // if(a>=25){
                 //     html += `<li class="li" style="background-color:red"></li>`
                 // }else if(a>=22.5 && a<25){
@@ -62,8 +60,7 @@
             }
             console.log("   ")
         }
-        // a = Math.round( bright(712-489,551-384,393-384,0,541-384,0,1.6,157,68)*10)/10
-        // console.log(a)
+
 function bright(alength, awidth, beginx, beginy, endx, endy, endz, Random_x, Random_y) {
 var length = endz;
 var width = awidth;
