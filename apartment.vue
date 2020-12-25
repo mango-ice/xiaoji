@@ -5112,7 +5112,7 @@
       getLightSideNum(cData) { // 判断采光面
         let total = 0,
           north = false,
-          east = false,
+          east = false, 
           west = false,
           south = false;
         for (let key in cData.areas) {
